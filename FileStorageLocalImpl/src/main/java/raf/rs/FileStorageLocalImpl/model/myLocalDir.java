@@ -100,7 +100,7 @@ public class myLocalDir implements myDir{
 		File sourceFile = new File(pathSource);
 		File destFile = new File(pathDest);
 		try {
-			FileUtils.moveDirectory(sourceFile, destFile);
+			FileUtils.copyDirectory(sourceFile, destFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
