@@ -2,7 +2,13 @@ package raf.rs.FileStorageLocalImpl.model;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
 
 import raf.rs.FIleStorageSpi.myDir;
 
@@ -91,6 +97,14 @@ public class myLocalDir implements myDir{
 
 	public boolean downloadDir(String pathSource, String pathDest) {
 		// TODO Auto-generated method stub
+		File sourceFile = new File(pathSource);
+		File destFile = new File(pathDest);
+		try {
+			FileUtils.moveDirectory(sourceFile, destFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return false;
 	}
 

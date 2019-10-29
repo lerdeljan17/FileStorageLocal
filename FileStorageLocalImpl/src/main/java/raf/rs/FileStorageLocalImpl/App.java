@@ -3,6 +3,7 @@ package raf.rs.FileStorageLocalImpl;
 import java.io.File;
 import java.util.Arrays;
 
+import raf.rs.FIleStorageSpi.myDir;
 import raf.rs.FileStorageLocalImpl.model.myLocalDir;
 
 public class App {
@@ -15,6 +16,7 @@ public class App {
         rootDir.delDir("C:\\Users\\laxy9\\Desktop\\root", "silvija2");
        File matches[] = rootDir.searchDirectory("C:\\Users\\laxy9\\Desktop\\root", "silvija");
         System.out.println(Arrays.toString(matches));
+        rootDir.downloadDir("C:\\Users\\laxy9\\Desktop\\root\\silvija5", "C:\\Users\\laxy9\\Desktop\\silvija5");
 	}
 
 }
