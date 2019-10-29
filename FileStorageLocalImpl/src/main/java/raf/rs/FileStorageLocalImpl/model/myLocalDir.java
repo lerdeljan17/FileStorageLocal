@@ -23,15 +23,7 @@ public class myLocalDir implements myDir{
 
 	public boolean initFileStorage(String path, String rootDirName) throws Exception {
 		// TODO Auto-generated method stub
-		File dir = new File(path+"\\" +rootDirName);
-        if (!dir.exists()) {
-            if (dir.mkdir()) {
-                System.out.println("Directory is created!");
-            } else {
-                System.out.println("Failed to create directory!");
-                return false;
-            }
-        }
+		File dir = createEmptyDir(path, rootDirName);
         boolean storageFile = new File(dir.getPath().toString()+"\\"+rootDirName+".settings").createNewFile();
 		return true;
 	}
@@ -42,13 +34,27 @@ public class myLocalDir implements myDir{
 	}
 
 	public boolean createMultipleDirectories(String path, String dirsName, int numberOfDirs) {
+		for (int i = 0; i < numberOfDirs; i++) {
+			File dir = createEmptyDir(path, dirsName+i);
+		            
+		}
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
-	public boolean createEmptyDir(String path, String fileName) {
+	public File createEmptyDir(String path, String fileName) {
 		// TODO Auto-generated method stub
-		return false;
+		File dir = new File(path+"\\" +fileName);
+		 if (!dir.exists()) {
+	            if (dir.mkdir()) {
+	                System.out.println("Directory is created!");
+	            } else {
+	                System.out.println("Failed to create directory!");
+	                
+	            }
+	            
+	}
+		return dir;
 	}
 
 	public boolean delDir(String ToDelPath, String dirName) {
