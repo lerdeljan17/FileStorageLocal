@@ -1,6 +1,7 @@
 package raf.rs.FileStorageLocalImpl.model;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.List;
 
 import raf.rs.FIleStorageSpi.myDir;
@@ -28,9 +29,19 @@ public class myLocalDir implements myDir{
 		return true;
 	}
 
-	public File searchDirectory(String dirPath, String searchFor) {
+	public File[] searchDirectory(String dirPath, String searchFor) {
+		final String search = searchFor;
 		// TODO Auto-generated method stub
-		return null;
+		File dir = new File(dirPath);
+
+		File[] matches = dir.listFiles(new FilenameFilter()
+		{
+		  public boolean accept(File dir, String name)
+		  {
+		     return name.contains(search);
+		  }
+		});
+		return matches;
 	}
 
 	public boolean createMultipleDirectories(String path, String dirsName, int numberOfDirs) {
@@ -46,6 +57,7 @@ public class myLocalDir implements myDir{
 		// TODO Auto-generated method stub
 		File dir = new File(path+"\\" +fileName);
 		 if (!dir.exists()) {
+			 	System.out.println(dir.toString());
 	            if (dir.mkdir()) {
 	                System.out.println("Directory is created!");
 	            } else {
@@ -58,8 +70,23 @@ public class myLocalDir implements myDir{
 	}
 
 	public boolean delDir(String ToDelPath, String dirName) {
+		File toDel = new File(ToDelPath+"\\"+dirName);
+		String[]entries = toDel.list();
+		for(String s: entries){
+		    File currentFile = new File(toDel.getPath(),s);
+		    currentFile.delete();
+		}
+	        if(toDel.delete()) 
+	        { 
+	            System.out.println("File deleted successfully"); 
+	        } 
+	        else
+	        { 
+	            System.out.println("Failed to delete the file"); 
+	            return false;
+	        } 
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	public boolean downloadDir(String pathSource, String pathDest) {
@@ -95,6 +122,22 @@ public class myLocalDir implements myDir{
 	public boolean isFileStorageRoot() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	public String getRootDirName() {
+		return rootDirName;
+	}
+
+	public void setRootDirName(String rootDirName) {
+		this.rootDirName = rootDirName;
 	}
 
 }
