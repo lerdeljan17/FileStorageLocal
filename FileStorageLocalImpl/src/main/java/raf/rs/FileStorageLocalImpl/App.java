@@ -4,19 +4,21 @@ import java.io.File;
 import java.util.Arrays;
 
 import raf.rs.FIleStorageSpi.myDir;
-import raf.rs.FileStorageLocalImpl.model.myLocalDir;
+import raf.rs.FileStorageLocalImpl.model.myLocalDirectory;
 
 public class App {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-        System.out.println( "Hello World!" );
-        myLocalDir rootDir = new myLocalDir("C:\\Users\\laxy9\\Desktop", "root");
-        rootDir.createMultipleDirectories(rootDir.getPath()+"\\"+rootDir.getRootDirName(), "silvija", 20);
-        rootDir.delDir("C:\\Users\\laxy9\\Desktop\\root", "silvija2");
-       File matches[] = rootDir.searchDirectory("C:\\Users\\laxy9\\Desktop\\root", "silvija");
-        System.out.println(Arrays.toString(matches));
-        rootDir.downloadDir("C:\\Users\\laxy9\\Desktop\\root\\silvija5", "C:\\Users\\laxy9\\Desktop\\silvija5");
+		System.out.println("Hello World!");
+		myLocalDirectory rootDir = new myLocalDirectory("C:\\Users\\subot\\Desktop", "root");
+	//	rootDir.createMultipleDirectories(rootDir.getPath() + "\\" + rootDir.getRootDirectoryName(), "silvija", 20);
+		rootDir.delDirectory("C:\\Users\\subot\\Desktop\\root", "silvija5");
+	//	File matches[] = rootDir.searchDirectory("C:\\Users\\subot\\Desktop\\root", "silvija");
+	//	System.out.println(Arrays.toString(matches));
+		rootDir.listDirectories("C:\\Users\\subot\\Desktop\\root");
+		rootDir.listFiles("C:\\Users\\subot\\Desktop\\root");
+		System.out.println(rootDir.getFilesWithExtension("C:\\Users\\subot\\Desktop\\root", "txt"));
+	//	rootDir.downloadDirectory("C:\\Users\\subot\\Desktop\\root\\silvija5", "C:\\Users\\subot\\Desktop\\silvija5");
 	}
 
 }
