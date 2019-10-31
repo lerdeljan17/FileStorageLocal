@@ -71,7 +71,7 @@ public class MyLocalDirectory implements MyDir {
 
 	public boolean createMultipleDirectories(String dirPath, String dirsName, int numberOfDirs) throws CreateException{
 		if(numberOfDirs <= 0) {
-			new CreateException();
+			throw new CreateException();
 		}
 		String path = FilenameUtils.separatorsToSystem(dirPath);
 		for (int i = 0; i < numberOfDirs; i++) {
@@ -88,7 +88,7 @@ public class MyLocalDirectory implements MyDir {
 			if (dir.mkdir()) {
 				System.out.println("Directory is created!");
 			} else {
-				new CreateException();
+				throw new CreateException();
 			}
 		}
 		return dir;
@@ -98,8 +98,7 @@ public class MyLocalDirectory implements MyDir {
 		String path = FilenameUtils.separatorsToSystem(ToDelPath + "\\" + dirName);
 		File toDel = new File(path);
 		if(!toDel.exists()) {
-			new NotFoundException(dirName);
-			return false;
+			throw new NotFoundException(dirName);
 		}
 		String[] entries = toDel.list();
 		for (String s : entries) {
@@ -123,7 +122,7 @@ public class MyLocalDirectory implements MyDir {
 		try {
 			FileUtils.copyDirectory(sourceFile, destFile);
 		} catch (IOException e) {
-			new DownloadException();
+			throw new DownloadException();
 			//e.printStackTrace();
 		}
 		return false;
@@ -174,8 +173,7 @@ public class MyLocalDirectory implements MyDir {
 		File root = new File(path);
 		//Za slucaj da se na prosledjenoj putanji ne nalazi direktorijum
 		if(!root.isDirectory()) {
-			new NotFoundException(dirPath);
-			return null;
+			throw new NotFoundException(dirPath);
 		}
 		
 		List<File> files = (List<File>) FileUtils.listFiles(root, null, true);

@@ -37,8 +37,7 @@ public class MyLocalFile extends File implements MyFile{
 		String filePath = FilenameUtils.separatorsToSystem(path + "\\" + fileName);
 		File file = new File(filePath);
 		if(!file.exists()) {
-			new NotFoundException(fileName);
-			return false;
+			throw new NotFoundException(fileName);
 		}
 		
 		if(file.delete()) {
@@ -55,9 +54,7 @@ public class MyLocalFile extends File implements MyFile{
 		File file = new File(filePath);
 		
 		if(file.exists()){
-			System.out.println("Fajl vec postoji!");
-			new Exception("Proba");
-			new CreateException("Vec postoji fajl sa tim imenom na prosledjenoj putanji!");
+			throw new CreateException("Vec postoji fajl sa tim imenom na prosledjenoj putanji!");
 		}
 		
 		try {

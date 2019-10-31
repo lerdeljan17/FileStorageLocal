@@ -13,7 +13,7 @@ public class App {
 
 	public static void main(String[] args) {
 		System.out.println("Hello World!");
-		MyLocalDirectory rootDir = new MyLocalDirectory("C:\\Users\\subot\\Desktop", "root");
+		MyLocalDirectory rootDir = new MyLocalDirectory("C:\\Users\\laxy9\\Desktop", "root");
 		
 		String path = FilenameUtils.separatorsToSystem(rootDir.getPath() + "\\" + rootDir.getRootDirectoryName());
 		MyLocalFile file = new MyLocalFile("Proba", path, rootDir);
