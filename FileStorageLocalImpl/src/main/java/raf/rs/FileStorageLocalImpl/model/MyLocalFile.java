@@ -11,29 +11,29 @@ import raf.rs.FIleStorageSpi.myFile;
 public class MyLocalFile implements myFile{
 
 	@Override
-	public boolean delFile(String path, String fileName) {
+	public boolean delFile(String path, String fileName) throws Exception {
 		String filePath = FilenameUtils.separatorsToSystem(path + "\\" + fileName);
 		File file = new File(filePath);
 		if(!file.exists()) {
+			
 		}
-		
 		return false;
 	}
 
 	@Override
-	public boolean createEmptyFile(String patest, String fileName) {
+	public boolean createEmptyFile(String patest, String fileName) throws Exception {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean downloadFile(String pathSource, String pathDest) {
+	public boolean downloadFile(String pathSource, String pathDest) throws Exception {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean uploadFile(String pathSource, String pathDest) {
+	public boolean uploadFile(String pathSource, String pathDest) throws Exception {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -63,15 +63,18 @@ public class MyLocalFile implements myFile{
 	}
 
 	@Override
-	public boolean uploadArchive(String archivePath, String destPath) {
+	public boolean uploadArchive(String archivePath, String destPath) throws Exception {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean uploadFilesAsArchive(String archiveName, String destPath, List<File> filesToArchive) {
+	public boolean uploadFilesAsArchive(String archiveName, String destPath, List<File> filesToArchive)
+			throws Exception {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
 
 }
