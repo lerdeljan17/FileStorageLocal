@@ -108,8 +108,7 @@ public class MyLocalDirectory implements MyDir {
 		if (toDel.delete()) {
 			System.out.println("File deleted successfully");
 		} else {
-			new DeleteException();
-			return false;
+			throw new DeleteException();
 		}
 		return true;
 	}
@@ -125,7 +124,7 @@ public class MyLocalDirectory implements MyDir {
 			throw new DownloadException();
 			//e.printStackTrace();
 		}
-		return false;
+		return true;
 	}
 
 	public String listDirectories(String dirPath) {

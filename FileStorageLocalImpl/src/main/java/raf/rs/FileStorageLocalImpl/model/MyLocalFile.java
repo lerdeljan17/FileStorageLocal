@@ -44,8 +44,7 @@ public class MyLocalFile extends File implements MyFile{
 			return true;
 		}
 		
-		new DeleteException();
-		return false;
+		throw new DeleteException();
 	}
 
 	@Override
@@ -66,8 +65,7 @@ public class MyLocalFile extends File implements MyFile{
 			e.printStackTrace();
 		}
 		
-		new CreateException();
-		return false;
+		throw new CreateException();
 	}
 
 	@Override
