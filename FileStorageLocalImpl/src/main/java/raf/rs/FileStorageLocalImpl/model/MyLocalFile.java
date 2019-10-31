@@ -1,28 +1,75 @@
 package raf.rs.FileStorageLocalImpl.model;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
-import raf.rs.FIleStorageSpi.myFile;
+import exceptions.CreateException;
+import exceptions.DeleteException;
+import exceptions.NotFoundException;
+import raf.rs.FIleStorageSpi.MyFile;
 
-public class MyLocalFile implements myFile{
+public class MyLocalFile extends File implements MyFile{
+	
+	private String name;
+	private MyLocalDirectory storage;
+	
+	public MyLocalFile(String name, String path, MyLocalDirectory storage) {
+		super(path);
+		this.name = name;
+		this.storage = storage;
+		try {
+			createEmptyFile(path, name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	@Override
 	public boolean delFile(String path, String fileName) throws Exception {
 		String filePath = FilenameUtils.separatorsToSystem(path + "\\" + fileName);
 		File file = new File(filePath);
 		if(!file.exists()) {
-			
+			new NotFoundException(fileName);
+			return false;
 		}
+		
+		if(file.delete()) {
+			return true;
+		}
+		
+		new DeleteException();
 		return false;
 	}
 
 	@Override
-	public boolean createEmptyFile(String patest, String fileName) throws Exception {
-		// TODO Auto-generated method stub
+	public boolean createEmptyFile(String path, String fileName) throws Exception{
+		String filePath = FilenameUtils.separatorsToSystem(path + "\\" + fileName);
+		File file = new File(filePath);
+		
+		if(file.exists()){
+			System.out.println("Fajl vec postoji!");
+			new Exception("Proba");
+			new CreateException("Vec postoji fajl sa tim imenom na prosledjenoj putanji!");
+		}
+		
+		try {
+			if(file.createNewFile()) {
+				System.out.println("Uspesno napravljen prazan fajl!");
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		new CreateException();
 		return false;
 	}
 

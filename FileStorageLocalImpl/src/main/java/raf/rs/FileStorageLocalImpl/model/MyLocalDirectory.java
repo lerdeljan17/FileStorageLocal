@@ -20,9 +20,9 @@ import exceptions.DeleteException;
 import exceptions.DownloadException;
 import exceptions.NotFoundException;
 import exceptions.StorageInitException;
-import raf.rs.FIleStorageSpi.myDir;
+import raf.rs.FIleStorageSpi.MyDir;
 
-public class MyLocalDirectory implements myDir {
+public class MyLocalDirectory implements MyDir {
 	
 	private String path;
 	private String rootDirName;
