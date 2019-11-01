@@ -13,10 +13,16 @@ public class App {
 
 	public static void main(String[] args) {
 		System.out.println("Hello World!");
-		MyLocalDirectory rootDir = new MyLocalDirectory("C:\\Users\\laxy9\\Desktop", "root");
+		MyLocalDirectory rootDir = new MyLocalDirectory("C:\\Users\\subot\\Desktop", "root");
 		
 		String path = FilenameUtils.separatorsToSystem(rootDir.getPath() + "\\" + rootDir.getRootDirectoryName());
-		MyLocalFile file = new MyLocalFile("Proba", path, rootDir);
+		MyLocalFile file = new MyLocalFile("Proba2", path, rootDir);
+		
+		try {
+			file.downloadFile("C:\\Users\\subot\\Desktop\\root\\Proba", "C:\\Users\\subot\\Desktop\\root\\silvija14");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		
 		

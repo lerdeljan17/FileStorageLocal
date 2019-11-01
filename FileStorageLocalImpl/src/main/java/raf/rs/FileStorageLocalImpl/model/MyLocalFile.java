@@ -69,15 +69,33 @@ public class MyLocalFile extends File implements MyFile{
 	}
 
 	@Override
-	public boolean downloadFile(String pathSource, String pathDest) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean downloadFile(String pathSource, String pathDest) throws Exception{
+		String sourcePath = FilenameUtils.separatorsToSystem(pathSource);
+		File file = new File(sourcePath);
+		
+		if (!file.exists()) {
+			throw new NotFoundException("Ne postoji fajl na toj lokaciji!");
+		}
+		
+		String destinationPath = FilenameUtils.separatorsToSystem(pathDest + "\\" + file.getName());
+		File newFile = new File(destinationPath);
+		
+		if(newFile.exists()) {
+			throw new CreateException("Postoji fajl sa tim nazivom!");
+		}
+		
+		if(!newFile.createNewFile()) {
+			throw new CreateException("Nije moguce skinuti fajl na prosledjenu putanju!");
+		}
+		
+		FileUtils.copyFile(file, newFile);
+		
+		return true;
 	}
 
 	@Override
 	public boolean uploadFile(String pathSource, String pathDest) throws Exception {
-		// TODO Auto-generated method stub
-		return false;
+		return downloadFile(pathDest, pathSource);
 	}
 
 	@Override
