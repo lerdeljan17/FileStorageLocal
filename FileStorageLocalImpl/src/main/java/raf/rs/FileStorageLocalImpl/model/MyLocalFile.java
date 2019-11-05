@@ -3,6 +3,7 @@ package raf.rs.FileStorageLocalImpl.model;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -26,11 +27,11 @@ public class MyLocalFile extends File implements MyFile{
 	private MyLocalDirectory storage;
 	
 	public MyLocalFile(String name, String path, MyLocalDirectory storage) {
-		super(path);
+		super(FilenameUtils.separatorsToSystem(path + "\\" + name));
 		this.name = name;
 		this.storage = storage;
 		try {
-			createEmptyFile(path, name);
+			//createEmptyFile(path, name);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -138,10 +139,14 @@ public class MyLocalFile extends File implements MyFile{
 	@Override
 	public boolean addMetaData(String metaFilePath, Hashtable<String, String> metaData) {
 		JSONObject js = new JSONObject(metaData);
+		System.out.println(js.toString());
 		try {
 			FileWriter file = new FileWriter(metaFilePath);
-			file.write(js.toString());
+			PrintWriter pw = new PrintWriter(file);
+			pw.append(js.toString());
 			System.out.println("Successfully Copied JSON Object to File...");
+			file.close();
+			pw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
