@@ -132,7 +132,7 @@ public class MyLocalFile extends File implements MyFile{
 	@Override
 	public boolean uploadArchive(String archivePath, String destPath) throws Exception {
 		
-		return true;
+		return false;
 	}
 
 	@Override
