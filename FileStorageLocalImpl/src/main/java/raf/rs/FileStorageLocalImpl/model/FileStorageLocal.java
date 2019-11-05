@@ -99,7 +99,29 @@ public class FileStorageLocal implements FileStorage {
 	@Override
 	public boolean closeConnectionWithUser(User user) {
 		// TODO Auto-generated method stub
-
+		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
+		JSONArray jsa = new JSONArray();
+		for (User o : users) {
+			JSONObject jso = new JSONObject();
+			jso.put("username", o.getUsername());
+			jso.put("password", o.getPassword());
+			jso.put("isRoot", o.isRootUser());
+			jso.put("privilages", o.getPrivilages());
+			jsa.put(jso);
+			
+		}
+		FileWriter fw;
+		try {
+			fw = new FileWriter(settings);
+			PrintWriter pw = new PrintWriter(fw);
+			pw.write(jsa.toString());
+			System.out.println("Successfully Copied JSON Object to File...");
+			fw.close();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return false;
 	}
 

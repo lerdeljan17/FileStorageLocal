@@ -26,6 +26,7 @@ public class App {
 		//FileStorageLocal fsl = new FileStorageLocal(rootDir, "stogod",user);
 		try {
 			user.connectToFileStorage(rootDir.getPath().toString(), "noviroot");
+			user.disconnectFromFileStorage(null);
 			//fsl.openConnectionWithUser(user);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
