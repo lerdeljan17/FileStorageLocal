@@ -23,16 +23,15 @@ import exceptions.StorageInitException;
 import raf.rs.FIleStorageSpi.MyDir;
 
 public class MyLocalDirectory implements MyDir {
-	
+
 	private String path;
 	private String rootDirName;
-	private List<String> forbiddenExtensions;
+	private File settingsFile;
 
 	public MyLocalDirectory(String path, String rootDirName) {
 		super();
 		this.path = FilenameUtils.separatorsToSystem(path);
 		this.rootDirName = rootDirName;
-		this.forbiddenExtensions = new ArrayList<String>();
 		try {
 			boolean b = initFileStorage(path, rootDirName);
 		} catch (Exception e) {
@@ -40,19 +39,23 @@ public class MyLocalDirectory implements MyDir {
 		}
 	}
 
-	public boolean initFileStorage(String dirPath, String rootDirName) throws StorageInitException{
+	public boolean initFileStorage(String dirPath, String rootDirName) throws StorageInitException {
 		String path = FilenameUtils.separatorsToSystem(dirPath);
-		File dir = null;
+		File dir = new File(path);
 		try {
-			dir = createEmptyDirectory(path, rootDirName);
+			if (!dir.exists()) {
+				dir = createEmptyDirectory(path, rootDirName);
+			} else {
+				this.settingsFile = new File(dir.getPath().toString() + "\\" + rootDirName +"\\"+ rootDirName + ".settings");
+			}
 		} catch (CreateException e1) {
 			e1.printStackTrace();
 		}
-		try {
-			boolean storageFile = new File(dir.getPath().toString() + "\\" + rootDirName + ".settings").createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			boolean storageFile = new File(dir.getPath().toString() + "\\" + rootDirName + ".settings").createNewFile();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 		return true;
 	}
 
@@ -69,8 +72,8 @@ public class MyLocalDirectory implements MyDir {
 		return matches;
 	}
 
-	public boolean createMultipleDirectories(String dirPath, String dirsName, int numberOfDirs) throws CreateException{
-		if(numberOfDirs <= 0) {
+	public boolean createMultipleDirectories(String dirPath, String dirsName, int numberOfDirs) throws CreateException {
+		if (numberOfDirs <= 0) {
 			throw new CreateException();
 		}
 		String path = FilenameUtils.separatorsToSystem(dirPath);
@@ -80,11 +83,11 @@ public class MyLocalDirectory implements MyDir {
 		return true;
 	}
 
-	public File createEmptyDirectory(String dirPath, String fileName) throws CreateException{
+	public File createEmptyDirectory(String dirPath, String fileName) throws CreateException {
 		String path = FilenameUtils.separatorsToSystem(dirPath + "\\" + fileName);
 		File dir = new File(path);
 		if (!dir.exists()) {
-			//System.out.println(dir.toString());
+			// System.out.println(dir.toString());
 			if (dir.mkdir()) {
 				System.out.println("Directory is created!");
 			} else {
@@ -94,10 +97,10 @@ public class MyLocalDirectory implements MyDir {
 		return dir;
 	}
 
-	public boolean delDirectory(String ToDelPath, String dirName) throws Exception{
+	public boolean delDirectory(String ToDelPath, String dirName) throws Exception {
 		String path = FilenameUtils.separatorsToSystem(ToDelPath + "\\" + dirName);
 		File toDel = new File(path);
-		if(!toDel.exists()) {
+		if (!toDel.exists()) {
 			throw new NotFoundException(dirName);
 		}
 		String[] entries = toDel.list();
@@ -113,7 +116,7 @@ public class MyLocalDirectory implements MyDir {
 		return true;
 	}
 
-	public boolean downloadDirectory(String pathSource, String pathDest) throws DownloadException{
+	public boolean downloadDirectory(String pathSource, String pathDest) throws DownloadException {
 		String newPathSource = FilenameUtils.separatorsToSystem(pathSource);
 		String newPathDest = FilenameUtils.separatorsToSystem(pathDest);
 		File sourceFile = new File(newPathSource);
@@ -122,7 +125,7 @@ public class MyLocalDirectory implements MyDir {
 			FileUtils.copyDirectory(sourceFile, destFile);
 		} catch (IOException e) {
 			throw new DownloadException();
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 		return true;
 	}
@@ -131,12 +134,12 @@ public class MyLocalDirectory implements MyDir {
 		String path = FilenameUtils.separatorsToSystem(dirPath);
 		File file = new File(path);
 		String[] directories = file.list(new FilenameFilter() {
-		  @Override
-		  public boolean accept(File current, String name) {
-		    return new File(current, name).isDirectory();
-		  }
+			@Override
+			public boolean accept(File current, String name) {
+				return new File(current, name).isDirectory();
+			}
 		});
-		//System.out.println(Arrays.toString(directories));
+		// System.out.println(Arrays.toString(directories));
 		return Arrays.toString(directories);
 	}
 
@@ -144,17 +147,17 @@ public class MyLocalDirectory implements MyDir {
 		String path = FilenameUtils.separatorsToSystem(directoryPath);
 		File file = new File(path);
 		String[] directories = file.list(new FilenameFilter() {
-		  @Override
-		  public boolean accept(File current, String name) {
-		    return new File(current, name).isFile();
-		  }
+			@Override
+			public boolean accept(File current, String name) {
+				return new File(current, name).isFile();
+			}
 		});
-	//	System.out.println(Arrays.toString(directories));
+		// System.out.println(Arrays.toString(directories));
 		return Arrays.toString(directories);
 	}
 
 	public List<File> getFilesWithExtension(String dirPath, String extension) {
-		String [] ext = {extension};
+		String[] ext = { extension };
 		String path = FilenameUtils.separatorsToSystem(dirPath);
 		File file = new File(path);
 		List<File> files = (List<File>) FileUtils.listFiles(file, ext, false);
@@ -167,28 +170,28 @@ public class MyLocalDirectory implements MyDir {
 		return null;
 	}
 
-	public List<String> getAllFiles(boolean sorted, String dirPath) throws Exception{
+	public List<String> getAllFiles(boolean sorted, String dirPath) throws Exception {
 		String path = FilenameUtils.separatorsToSystem(dirPath);
 		File root = new File(path);
-		//Za slucaj da se na prosledjenoj putanji ne nalazi direktorijum
-		if(!root.isDirectory()) {
+		// Za slucaj da se na prosledjenoj putanji ne nalazi direktorijum
+		if (!root.isDirectory()) {
 			throw new NotFoundException(dirPath);
 		}
-		
+
 		List<File> files = (List<File>) FileUtils.listFiles(root, null, true);
-		if(files.isEmpty()) {
+		if (files.isEmpty()) {
 			return null;
 		}
-		
+
 		List<String> filesName = new ArrayList<String>();
 		for (File f : files) {
 			filesName.add(f.getName());
 		}
-		
-		if(sorted) {
+
+		if (sorted) {
 			Collections.sort(filesName);
 		}
-		
+
 		return filesName;
 	}
 
@@ -213,12 +216,24 @@ public class MyLocalDirectory implements MyDir {
 		this.rootDirName = rootDirName;
 	}
 
-	@Override
-	public void setForbiddenExtension(String extension) {
-		if(extension.contains(".")) {
-			extension.replace(".", "");
-		}
-		this.forbiddenExtensions.add(extension);		
+	public String getWholePath() {
+		return FilenameUtils.separatorsToSystem(this.path + "\\" + rootDirName);
+	}
+
+	public String getRootDirName() {
+		return rootDirName;
+	}
+
+	public void setRootDirName(String rootDirName) {
+		this.rootDirName = rootDirName;
+	}
+
+	public File getSettingsFile() {
+		return settingsFile;
+	}
+
+	public void setSettingsFile(File settingsFile) {
+		this.settingsFile = settingsFile;
 	}
 
 }

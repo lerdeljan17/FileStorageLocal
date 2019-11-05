@@ -133,8 +133,18 @@ public class MyLocalFile extends File implements MyFile{
 	@Override
 	public boolean createMetaDataFile(String FilePath, String metaFileName, Hashtable<String, String> metaData) {
 		// TODO Auto-generated method stub
-		
-		return false;
+		JSONObject js = new JSONObject(metaData);
+		try {
+			FileWriter file = new FileWriter(FilePath+".metaData");
+			PrintWriter pw = new PrintWriter(file);
+			pw.append(js.toString());
+			System.out.println("Successfully Copied JSON Object to File...");
+			file.close();
+			pw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
 	}
 
 	@Override
@@ -151,7 +161,7 @@ public class MyLocalFile extends File implements MyFile{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return true;
 	}
 
 	@Override
