@@ -1,6 +1,7 @@
 package raf.rs.FileStorageLocalImpl.model;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.json.JSONObject;
 import org.zeroturnaround.zip.ZipUtil;
 
 import exceptions.CreateException;
@@ -97,7 +99,7 @@ public class MyLocalFile extends File implements MyFile{
 
 	@Override
 	public boolean uploadFile(String pathSource, String pathDest) throws Exception {
-		return downloadFile(pathDest, pathSource);
+		return downloadFile(pathSource, pathDest);
 	}
 
 	@Override
@@ -112,9 +114,19 @@ public class MyLocalFile extends File implements MyFile{
 	}
 
 	@Override
-	public boolean uploadMultipleFiles(String pathDest, List<File> files, List<File> metaDataFiles) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean uploadMultipleFiles(String pathDest, List<File> files, List<File> metaDataFiles) throws Exception{
+		for (File file : files) {
+			uploadFile(file.getPath().toString(), pathDest);
+		}
+		if (metaDataFiles != null) {
+			if (!metaDataFiles.isEmpty()) {
+				for (File file : metaDataFiles) {
+					uploadFile(file.getPath().toString(), pathDest);
+
+				}
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -125,7 +137,14 @@ public class MyLocalFile extends File implements MyFile{
 
 	@Override
 	public boolean addMetaData(String metaFilePath, Hashtable<String, String> metaData) {
-		// TODO Auto-generated method stub
+		JSONObject js = new JSONObject(metaData);
+		try {
+			FileWriter file = new FileWriter(metaFilePath);
+			file.write(js.toString());
+			System.out.println("Successfully Copied JSON Object to File...");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 
