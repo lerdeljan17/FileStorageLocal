@@ -14,6 +14,13 @@ public class LocalUser extends User {
 	}
 
 	@Override
+	public boolean createNewUser(String username, String password) {
+		// TODO Auto-generated method stub
+		FileStorage.getUsers().add(new User(username, password));
+		return true;
+	}
+
+	@Override
 	public boolean connectToFileStorage(String rootDirPath, String FileStorageRootDirName) throws Exception {
 		// TODO Auto-generated method stub
 		this.FileStorage = new FileStorageLocal(new MyLocalDirectory(rootDirPath, FileStorageRootDirName), this);
@@ -26,6 +33,11 @@ public class LocalUser extends User {
 		this.FileStorage.closeConnectionWithUser(this);
 		this.FileStorage = null;
 		return true;
+	}
+	@Override
+	public void revokePrivilage(User revokeFromUser, String privilage) {
+		// TODO Auto-generated method stub
+		((User)FileStorage.getUsers().get(FileStorage.getUsers().indexOf(revokeFromUser))).getPrivilages().remove(privilage);
 	}
 
 	@Override

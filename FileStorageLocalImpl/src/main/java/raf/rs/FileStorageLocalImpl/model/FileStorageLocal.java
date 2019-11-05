@@ -101,7 +101,9 @@ public class FileStorageLocal implements FileStorage {
 		// TODO Auto-generated method stub
 		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
 		JSONArray jsa = new JSONArray();
-		users.add(new User("laco", "slaco", null));
+		//users.add(new User("laco", "slaco", null));
+		rootUser.createNewUser("laco", "slaco");
+		rootUser.revokePrivilage(new User("laco", "slaco"),"del");
 		for (User o : users) {
 			JSONObject jso = new JSONObject();
 			jso.put("username", o.getUsername());
@@ -148,6 +150,46 @@ public class FileStorageLocal implements FileStorage {
 		} else {
 			throw new NoSuchUserException();
 		}
+	}
+
+	public MyLocalDirectory getRootDir() {
+		return rootDir;
+	}
+
+	public void setRootDir(MyLocalDirectory rootDir) {
+		this.rootDir = rootDir;
+	}
+
+	public List<String> getForbiddenExtensions() {
+		return forbiddenExtensions;
+	}
+
+	public void setForbiddenExtensions(List<String> forbiddenExtensions) {
+		this.forbiddenExtensions = forbiddenExtensions;
+	}
+
+	public String getFileStorageName() {
+		return fileStorageName;
+	}
+
+	public void setFileStorageName(String fileStorageName) {
+		this.fileStorageName = fileStorageName;
+	}
+
+	public ArrayList<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(ArrayList<User> users) {
+		this.users = users;
+	}
+
+	public User getRootUser() {
+		return rootUser;
+	}
+
+	public void setRootUser(User rootUser) {
+		this.rootUser = rootUser;
 	}
 
 }
