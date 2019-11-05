@@ -27,6 +27,8 @@ public class App {
 		try {
 			user.connectToFileStorage(rootDir.getPath().toString(), "noviroot");
 			user.disconnectFromFileStorage(null);
+			MyLocalFile file = new MyLocalFile(null, null, null);
+			file.uploadArchive("C:\\Users\\laxy9\\Desktop\\try.zip", "C:\\Users\\laxy9\\Desktop\\root");
 			//fsl.openConnectionWithUser(user);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block

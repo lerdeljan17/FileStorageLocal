@@ -101,6 +101,7 @@ public class FileStorageLocal implements FileStorage {
 		// TODO Auto-generated method stub
 		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
 		JSONArray jsa = new JSONArray();
+		users.add(new User("laco", "slaco", null));
 		for (User o : users) {
 			JSONObject jso = new JSONObject();
 			jso.put("username", o.getUsername());
