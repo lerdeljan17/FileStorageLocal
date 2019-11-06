@@ -102,8 +102,8 @@ public class FileStorageLocal implements FileStorage {
 		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
 		JSONArray jsa = new JSONArray();
 		//users.add(new User("laco", "slaco", null));
-		rootUser.createNewUser("laco", "slaco");
-		rootUser.revokePrivilage(new User("laco", "slaco"),"del");
+		//rootUser.createNewUser("laco", "slaco");
+		//rootUser.revokePrivilage(new User("laco", "slaco"),"del");
 		for (User o : users) {
 			JSONObject jso = new JSONObject();
 			jso.put("username", o.getUsername());
@@ -144,7 +144,7 @@ public class FileStorageLocal implements FileStorage {
 			this.users.add(newUser);
 			// System.out.println("Novi user " + newUser);
 		}
-		if (this.users.contains(user)) {
+		if (this.users.contains(user) && this.users.get(this.users.indexOf(user)).getPassword().equals(user.getPassword())) {
 			System.out.println("Connection established");
 			return true;
 		} else {
