@@ -119,6 +119,12 @@ public class MyLocalFile extends File implements MyFile{
 		for (File file : files) {
 			uploadFile(file.getPath().toString(), pathDest);
 		}
+		for (File file : files) {
+			File mt = new File(file.getAbsoluteFile().toString()+".metaData");
+			if(mt.exists()) {
+				metaDataFiles.add(mt);
+			}
+		}
 		if (metaDataFiles != null) {
 			if (!metaDataFiles.isEmpty()) {
 				for (File file : metaDataFiles) {

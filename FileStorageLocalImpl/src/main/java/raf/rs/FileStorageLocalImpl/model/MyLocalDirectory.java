@@ -143,7 +143,7 @@ public class MyLocalDirectory implements MyDir {
 		return Arrays.toString(directories);
 	}
 
-	public String listFiles(String directoryPath) {
+	public String listFiles(String directoryPath,boolean withMetaData) {
 		String path = FilenameUtils.separatorsToSystem(directoryPath);
 		File file = new File(path);
 		String[] directories = file.list(new FilenameFilter() {
@@ -152,8 +152,17 @@ public class MyLocalDirectory implements MyDir {
 				return new File(current, name).isFile();
 			}
 		});
+		ArrayList<String> toRet = new ArrayList<String>();
+		toRet.toArray(directories);
+		if(withMetaData) {
+		for (int i = 0; i < directories.length; i++) {
+			File tmp = new File(directories[i]+".metaData");
+			if(!tmp.exists()) {
+				toRet.remove(i);
+			}
+		}}
 		// System.out.println(Arrays.toString(directories));
-		return Arrays.toString(directories);
+		return toRet.toString();
 	}
 
 	public List<File> getFilesWithExtension(String dirPath, String extension) {
@@ -165,10 +174,10 @@ public class MyLocalDirectory implements MyDir {
 		return files;
 	}
 
-	public File getFilesWithMetadata(boolean withMetaData) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	//public String getFilesWithMetadata(boolean withMetaData) {
+		
+		//return null;
+	//}
 
 	public List<String> getAllFiles(boolean sorted, String dirPath) throws Exception {
 		String path = FilenameUtils.separatorsToSystem(dirPath);
@@ -234,6 +243,12 @@ public class MyLocalDirectory implements MyDir {
 
 	public void setSettingsFile(File settingsFile) {
 		this.settingsFile = settingsFile;
+	}
+
+	@Override
+	public File getFilesWithMetadata(boolean withMetaData) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

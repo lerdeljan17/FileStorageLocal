@@ -28,6 +28,7 @@ public class FileStorageLocal implements FileStorage {
 
 	public FileStorageLocal(MyLocalDirectory rootDir, String fileStorageName, User rootUser) {
 		super();
+		rootUser.setRootUser(true);
 		this.initFileStorage(rootDir, fileStorageName, rootUser);
 	}
 
