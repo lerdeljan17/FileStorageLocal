@@ -251,4 +251,10 @@ public class MyLocalDirectory implements MyDir {
 		return null;
 	}
 
+	@Override
+	public boolean createEmptyDirectoryB(String path, String fileName) throws Exception {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

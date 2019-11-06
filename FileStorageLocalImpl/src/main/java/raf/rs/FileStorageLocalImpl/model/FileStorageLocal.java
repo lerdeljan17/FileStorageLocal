@@ -24,7 +24,8 @@ public class FileStorageLocal implements FileStorage {
 	private List<String> forbiddenExtensions;
 	private String fileStorageName;
 	private ArrayList<User> users;
-	private User rootUser;
+	private User currentUser;
+	private String rootDirPath;
 
 	public FileStorageLocal(MyLocalDirectory rootDir, String fileStorageName, User rootUser) {
 		super();
@@ -35,7 +36,7 @@ public class FileStorageLocal implements FileStorage {
 	public FileStorageLocal(MyLocalDirectory rootDir, User rootUser) throws Exception {
 		super();
 		this.forbiddenExtensions = new ArrayList<String>();
-		this.rootUser = rootUser;
+		this.currentUser = rootUser;
 		this.users = new ArrayList<User>();
 		connect(rootDir, rootUser);
 	}
@@ -43,7 +44,7 @@ public class FileStorageLocal implements FileStorage {
 	public boolean connect(MyLocalDirectory rootDir, User rootUser) throws Exception {
 		this.rootDir = (MyLocalDirectory) rootDir;
 		this.forbiddenExtensions = new ArrayList<String>();
-		this.rootUser = rootUser;
+		this.currentUser = rootUser;
 		this.users = new ArrayList<User>();
 		// users.add(rootUser);
 		openConnectionWithUser(rootUser);
@@ -56,7 +57,8 @@ public class FileStorageLocal implements FileStorage {
 		this.rootDir = (MyLocalDirectory) rootDir;
 		this.fileStorageName = name;
 		this.forbiddenExtensions = new ArrayList<String>();
-		this.rootUser = rootUser;
+		this.currentUser = rootUser;
+		this.currentUser.setRootUser(true);
 		this.users = new ArrayList<User>();
 		users.add(rootUser);
 		this.createFileStorageMetaData(this.rootDir);
@@ -68,10 +70,10 @@ public class FileStorageLocal implements FileStorage {
 		File storageFile = new File(storagePath);
 		JSONArray jsa = new JSONArray();
 		JSONObject jso = new JSONObject();
-		jso.put("username", this.rootUser.getUsername());
-		jso.put("password", this.rootUser.getPassword());
-		jso.put("isRoot", this.rootUser.isRootUser());
-		jso.put("privilages", this.rootUser.getPrivilages());
+		jso.put("username", this.currentUser.getUsername());
+		jso.put("password", this.currentUser.getPassword());
+		jso.put("isRoot", this.currentUser.isRootUser());
+		jso.put("privilages", this.currentUser.getPrivilages());
 		jsa.put(jso);
 		System.out.println(jsa.toString());
 
@@ -141,7 +143,8 @@ public class FileStorageLocal implements FileStorage {
 				prv.add((String) object);
 			}
 			User newUser = new User(schemaObject.getJSONObject(i).getString("username").toString(),
-					schemaObject.getJSONObject(i).getString("password").toString(), prv);
+					schemaObject.getJSONObject(i).getString("password").toString(),
+					schemaObject.getJSONObject(i).getBoolean("isRoot"), prv);
 			this.users.add(newUser);
 			// System.out.println("Novi user " + newUser);
 		}
@@ -186,11 +189,11 @@ public class FileStorageLocal implements FileStorage {
 	}
 
 	public User getRootUser() {
-		return rootUser;
+		return currentUser;
 	}
 
 	public void setRootUser(User rootUser) {
-		this.rootUser = rootUser;
+		this.currentUser = rootUser;
 	}
 
 }

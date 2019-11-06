@@ -8,8 +8,8 @@ public class LocalUser extends User {
 
 	private FileStorageLocal FileStorage;
 
-	public LocalUser(String username, String password, ArrayList<String> privilages) {
-		super(username, password, privilages);
+	public LocalUser(String username, String password,boolean isRoot, ArrayList<String> privilages) {
+		super(username, password,isRoot, privilages);
 		// TODO Auto-generated constructor stub
 	}
 
