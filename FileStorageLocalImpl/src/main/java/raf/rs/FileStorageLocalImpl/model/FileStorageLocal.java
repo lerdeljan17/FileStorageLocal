@@ -14,59 +14,68 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import exceptions.NoSuchUserException;
+import exceptions.StorageInitException;
 import raf.rs.FIleStorageSpi.FileStorage;
 import raf.rs.FIleStorageSpi.MyDir;
 import raf.rs.FIleStorageSpi.User;
 
 public class FileStorageLocal implements FileStorage {
 
-	private MyLocalDirectory rootDir;
 	private List<String> forbiddenExtensions;
+
+	private String rootDirPath;
 	private String fileStorageName;
+
 	private ArrayList<User> users;
 	private User currentUser;
-	private String rootDirPath;
 
-	public FileStorageLocal(MyLocalDirectory rootDir, String fileStorageName, User rootUser) {
+	public FileStorageLocal(String rootPath, String fileStorageName, User rootUser) throws Exception {
 		super();
 		rootUser.setRootUser(true);
-		this.initFileStorage(rootDir, fileStorageName, rootUser);
+		this.initFileStorage(rootPath, fileStorageName, rootUser);
 	}
 
-	public FileStorageLocal(MyLocalDirectory rootDir, User rootUser) throws Exception {
+	public FileStorageLocal(String rootPath, User rootUser) throws Exception {
 		super();
 		this.forbiddenExtensions = new ArrayList<String>();
 		this.currentUser = rootUser;
 		this.users = new ArrayList<User>();
-		connect(rootDir, rootUser);
+		connect(rootUser);
 	}
 
-	public boolean connect(MyLocalDirectory rootDir, User rootUser) throws Exception {
-		this.rootDir = (MyLocalDirectory) rootDir;
+	@Override
+	public boolean initFileStorage(String rootDir, String name, User rootUser) throws Exception {
+		String path = FilenameUtils.separatorsToSystem(rootDir);
+		File rootFile = new File(path);
+		if (rootFile.exists()) {
+			throw new StorageInitException("Na prosledjenoj putanji vec postoji fajl!");
+		} else {
+			if (rootFile.mkdir()) {
+				System.out.println("Napravljen je root folder na putanji " + path);
+			} else {
+				throw new StorageInitException("Ne moze da se napravi root na putanji " + path);
+			}
+		}
+
+		this.rootDirPath = path;
+		this.currentUser = rootUser;
+		this.fileStorageName = name;
+
+		return true;
+	}
+
+	public boolean connect(User rootUser) throws Exception {
 		this.forbiddenExtensions = new ArrayList<String>();
 		this.currentUser = rootUser;
 		this.users = new ArrayList<User>();
-		// users.add(rootUser);
+		users.add(rootUser);
 		openConnectionWithUser(rootUser);
 		return true;
 	}
 
-	@Override
-	public boolean initFileStorage(MyDir rootDir, String name, User rootUser) {
-		// TODO  dodati i da moze usera da primi
-		this.rootDir = (MyLocalDirectory) rootDir;
-		this.fileStorageName = name;
-		this.forbiddenExtensions = new ArrayList<String>();
-		this.currentUser = rootUser;
-		this.currentUser.setRootUser(true);
-		this.users = new ArrayList<User>();
-		users.add(rootUser);
-		this.createFileStorageMetaData(this.rootDir);
-		return false;
-	}
-
-	private void createFileStorageMetaData(MyLocalDirectory dir) {
-		String storagePath = FilenameUtils.separatorsToSystem(dir.getWholePath() + "\\" + dir.getRootDirectoryName() + ".settings");
+	/*
+	private void createFileStorageMetaData() {
+		String storagePath = FilenameUtils.separatorsToSystem(rootDirPath + ".settings");
 		File storageFile = new File(storagePath);
 		JSONArray jsa = new JSONArray();
 		JSONObject jso = new JSONObject();
@@ -88,8 +97,9 @@ public class FileStorageLocal implements FileStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.rootDir.setSettingsFile(storageFile);
+		// this.rootDir.setSettingsFile(storageFile);
 	}
+	*/
 
 	@Override
 	public void addForbiddenExtension(String extension) {
@@ -101,12 +111,12 @@ public class FileStorageLocal implements FileStorage {
 
 	@Override
 	public boolean closeConnectionWithUser(User user) {
-		// TODO Auto-generated method stub
-		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
+		String path = FilenameUtils.separatorsToSystem(rootDirPath + ".settings");
+		File settings = new File(path);
 		JSONArray jsa = new JSONArray();
-		//users.add(new User("laco", "slaco", null));
-		//rootUser.createNewUser("laco", "slaco");
-		//rootUser.revokePrivilage(new User("laco", "slaco"),"del");
+		// users.add(new User("laco", "slaco", null));
+		// rootUser.createNewUser("laco", "slaco");
+		// rootUser.revokePrivilage(new User("laco", "slaco"),"del");
 		for (User o : users) {
 			JSONObject jso = new JSONObject();
 			jso.put("username", o.getUsername());
@@ -114,7 +124,7 @@ public class FileStorageLocal implements FileStorage {
 			jso.put("isRoot", o.isRootUser());
 			jso.put("privilages", o.getPrivilages());
 			jsa.put(jso);
-			
+
 		}
 		JSONArray jse = new JSONArray(forbiddenExtensions);
 		JSONObject js = new JSONObject();
@@ -131,13 +141,14 @@ public class FileStorageLocal implements FileStorage {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return false;
 	}
 
 	@Override
 	public boolean openConnectionWithUser(User user) throws Exception {
-		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
+		String path = FilenameUtils.separatorsToSystem(rootDirPath + ".settings");
+		File settings = new File(path);
 		String jsonStr = FileUtils.readFileToString(settings, Charset.defaultCharset());
 		System.out.println(jsonStr);
 		JSONObject mainObj = new JSONObject(jsonStr);
@@ -157,20 +168,13 @@ public class FileStorageLocal implements FileStorage {
 		for (int i = 0; i < extensions.length(); i++) {
 			forbiddenExtensions.add((String) extensions.getString(i));
 		}
-		if (this.users.contains(user) && this.users.get(this.users.indexOf(user)).getPassword().equals(user.getPassword())) {
+		if (this.users.contains(user)
+				&& this.users.get(this.users.indexOf(user)).getPassword().equals(user.getPassword())) {
 			System.out.println("Connection established");
 			return true;
 		} else {
 			throw new NoSuchUserException();
 		}
-	}
-
-	public MyLocalDirectory getRootDir() {
-		return rootDir;
-	}
-
-	public void setRootDir(MyLocalDirectory rootDir) {
-		this.rootDir = rootDir;
 	}
 
 	public List<String> getForbiddenExtensions() {

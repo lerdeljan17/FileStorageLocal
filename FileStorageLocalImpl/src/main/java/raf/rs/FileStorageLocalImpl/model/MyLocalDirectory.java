@@ -25,15 +25,15 @@ import raf.rs.FIleStorageSpi.MyDir;
 public class MyLocalDirectory implements MyDir {
 
 	private String path;
-	private String rootDirName;
+	private String name;
 	private File settingsFile;
 
-	public MyLocalDirectory(String path, String rootDirName) {
+	public MyLocalDirectory(String path, String name) {
 		super();
 		this.path = FilenameUtils.separatorsToSystem(path);
-		this.rootDirName = rootDirName;
+		this.name = name;
 		try {
-			boolean b = initFileStorage(path, rootDirName);
+			boolean b = initFileStorage(path, name);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -217,24 +217,16 @@ public class MyLocalDirectory implements MyDir {
 		this.path = path;
 	}
 
-	public String getRootDirectoryName() {
-		return rootDirName;
+	public String getName() {
+		return name;
 	}
-
-	public void setRootDirectoryName(String rootDirName) {
-		this.rootDirName = rootDirName;
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getWholePath() {
-		return FilenameUtils.separatorsToSystem(this.path + "\\" + rootDirName);
-	}
-
-	public String getRootDirName() {
-		return rootDirName;
-	}
-
-	public void setRootDirName(String rootDirName) {
-		this.rootDirName = rootDirName;
+		return FilenameUtils.separatorsToSystem(this.path + "\\" + name);
 	}
 
 	public File getSettingsFile() {

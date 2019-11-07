@@ -2,55 +2,63 @@ package raf.rs.FileStorageLocalImpl.model;
 
 import java.util.ArrayList;
 
+import exceptions.PrivilageException;
 import raf.rs.FIleStorageSpi.User;
 
 public class LocalUser extends User {
 
-	private FileStorageLocal FileStorage;
+	private FileStorageLocal fileStorage;
 
 	public LocalUser(String username, String password,boolean isRoot, ArrayList<String> privilages) {
 		super(username, password,isRoot, privilages);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public boolean createNewUser(String username, String password) {
-		// TODO Auto-generated method stub
-		FileStorage.getUsers().add(new User(username, password));
+		fileStorage.getUsers().add(new User(username, password));
 		return true;
 	}
 
 	@Override
 	public boolean connectToFileStorage(String rootDirPath, String FileStorageRootDirName) throws Exception {
-		// TODO Auto-generated method stub
-		this.FileStorage = new FileStorageLocal(new MyLocalDirectory(rootDirPath, FileStorageRootDirName), this);
+		this.fileStorage = new FileStorageLocal(rootDirPath, FileStorageRootDirName, this);
 		return true;
 	}
 
 	@Override
 	public boolean disconnectFromFileStorage(String fileStorageRootDir) {
-		// TODO Auto-generated method stub
-		this.FileStorage.closeConnectionWithUser(this);
-		this.FileStorage = null;
+		this.fileStorage.closeConnectionWithUser(this);
+		this.fileStorage = null;
 		return true;
 	}
+	
 	@Override
-	public void revokePrivilage(User revokeFromUser, String privilage) {
-		// TODO Auto-generated method stub
-		((User)FileStorage.getUsers().get(FileStorage.getUsers().indexOf(revokeFromUser))).getPrivilages().remove(privilage);
+	public void revokePrivilage(User revokeFromUser, String privilage) throws Exception {
+		//TODO da li treba proveriti da li fileStorage postoji
+		
+		if(!fileStorage.getUsers().contains(revokeFromUser)) {
+			throw new PrivilageException("Korisnik za koga zelite da povucete privilegije ne postoji u skladistu!");
+		}
+		
+		User user = fileStorage.getUsers().get(fileStorage.getUsers().indexOf(revokeFromUser));
+		
+		if(!user.getPrivilages().contains(privilage)) {
+			throw new PrivilageException("Korisnik nema privilegiju koju zelite da obrisete!");
+		}
+		
+		user.getPrivilages().remove(privilage);		
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
 		return super.equals(obj);
 	}
 
 	public FileStorageLocal getFileStorage() {
-		return FileStorage;
+		return fileStorage;
 	}
 
 	public void setFileStorage(FileStorageLocal fileStorage) {
-		FileStorage = fileStorage;
+		this.fileStorage = fileStorage;
 	}
 }
