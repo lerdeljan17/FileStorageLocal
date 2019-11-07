@@ -92,7 +92,7 @@ public class FileStorageLocal implements FileStorage {
 	}
 
 	@Override
-	public void setForbiddenExtension(String extension) {
+	public void addForbiddenExtension(String extension) {
 		if (extension.contains(".")) {
 			extension.replace(".", "");
 		}
@@ -116,6 +116,10 @@ public class FileStorageLocal implements FileStorage {
 			jsa.put(jso);
 			
 		}
+		JSONArray jse = new JSONArray(forbiddenExtensions);
+		JSONObject js = new JSONObject();
+		js.put("users", jsa);
+		js.put("extensions", jse);
 		FileWriter fw;
 		try {
 			fw = new FileWriter(settings);
@@ -136,7 +140,8 @@ public class FileStorageLocal implements FileStorage {
 		File settings = new File(this.rootDir.getSettingsFile().getPath().toString());
 		String jsonStr = FileUtils.readFileToString(settings, Charset.defaultCharset());
 		System.out.println(jsonStr);
-		JSONArray schemaObject = new JSONArray(jsonStr);
+		JSONObject mainObj = new JSONObject(jsonStr);
+		JSONArray schemaObject = new JSONArray(mainObj.getJSONArray("users"));
 		for (int i = 0; i < schemaObject.length(); i++) {
 			ArrayList<String> prv = new ArrayList<String>();
 			for (Object object : schemaObject.getJSONObject(i).getJSONArray("privilages").toList()) {
@@ -147,6 +152,10 @@ public class FileStorageLocal implements FileStorage {
 					schemaObject.getJSONObject(i).getBoolean("isRoot"), prv);
 			this.users.add(newUser);
 			// System.out.println("Novi user " + newUser);
+		}
+		JSONArray extensions = new JSONArray(mainObj.get("extensions"));
+		for (int i = 0; i < extensions.length(); i++) {
+			forbiddenExtensions.add((String) extensions.getString(i));
 		}
 		if (this.users.contains(user) && this.users.get(this.users.indexOf(user)).getPassword().equals(user.getPassword())) {
 			System.out.println("Connection established");
