@@ -40,7 +40,7 @@ public class App {
 			Hashtable<String, String> metaData = new Hashtable<String, String>();
 			metaData.put("laca", "190");
 			metaData.put("sicko", "188");
-			mf.createMetaDataFile("probe 7","probe 7", metaData);
+			mf.createMetaDataFile("probe 7", metaData);
 			mf.addMetaData("probe 7.metaData", metaData);
 			mf.uploadFile("C:\\Users\\subot\\Desktop\\App.txt", "");//prosledjuje se dir na koji se uploaduje nema potrebe za imenom fajla
 			System.out.println(md.listFiles("", false));

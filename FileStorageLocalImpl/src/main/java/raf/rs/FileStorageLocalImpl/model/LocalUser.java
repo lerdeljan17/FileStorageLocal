@@ -23,6 +23,7 @@ public class LocalUser extends User {
 			super.getPrivilages().add(PrivilageType.CREATE);
 			super.getPrivilages().add(PrivilageType.UPLOAD);
 			super.getPrivilages().add(PrivilageType.DOWNLOAD);
+			super.getPrivilages().add(PrivilageType.META);
 		}
 	}
 
@@ -34,7 +35,9 @@ public class LocalUser extends User {
 		
 		LocalUser newUser = new LocalUser(username, password, false);
 		newUser.setFileStorage(((LocalUser)user).getFileStorage());
+		newUser.getPrivilages().add(PrivilageType.READ);
 		fileStorage.getUsers().add(newUser);
+		System.out.println(fileStorage.getUsers());
 		return newUser;
 	}
 

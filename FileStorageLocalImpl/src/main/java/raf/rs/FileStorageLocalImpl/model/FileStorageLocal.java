@@ -50,7 +50,11 @@ public class FileStorageLocal implements FileStorage {
 		} else {
 			connect(user);
 		}
-		((LocalUser) user).setFileStorage(this);
+		
+		if(this != null) {
+			((LocalUser) user).setFileStorage(this);
+		}
+		
 		this.currentUser = user;
 	}
 
