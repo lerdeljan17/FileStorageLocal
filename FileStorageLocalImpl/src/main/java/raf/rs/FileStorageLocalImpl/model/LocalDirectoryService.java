@@ -22,46 +22,23 @@ import exceptions.NotFoundException;
 import exceptions.StorageInitException;
 import raf.rs.FIleStorageSpi.MyDir;
 
-public class MyLocalDirectory implements MyDir {
+public class LocalDirectoryService implements MyDir {
 
 	private String path;
 	private String name;
 	private File settingsFile;
+	private FileStorageLocal storage;
 
-	public MyLocalDirectory(String path, String name) {
+	public LocalDirectoryService(FileStorageLocal storage) {
 		super();
-		this.path = FilenameUtils.separatorsToSystem(path);
-		this.name = name;
-		try {
-			boolean b = initFileStorage(path, name);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public boolean initFileStorage(String dirPath, String rootDirName) throws StorageInitException {
-		String path = FilenameUtils.separatorsToSystem(dirPath);
-		File dir = new File(path);
-		try {
-			if (!dir.exists()) {
-				dir = createEmptyDirectory(path, rootDirName);
-			} else {
-				this.settingsFile = new File(dir.getPath().toString() + "\\" + rootDirName +"\\"+ rootDirName + ".settings");
-			}
-		} catch (CreateException e1) {
-			e1.printStackTrace();
-		}
-//		try {
-//			boolean storageFile = new File(dir.getPath().toString() + "\\" + rootDirName + ".settings").createNewFile();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-		return true;
+		// this.path = FilenameUtils.separatorsToSystem(path);
+		// this.name = name;
+		this.storage = storage;
 	}
 
 	public File[] searchDirectory(String dirPath, String searchFor) {
 		final String search = searchFor;
-		String path = FilenameUtils.separatorsToSystem(dirPath);
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + dirPath);
 		File dir = new File(path);
 
 		File[] matches = dir.listFiles(new FilenameFilter() {
@@ -78,13 +55,13 @@ public class MyLocalDirectory implements MyDir {
 		}
 		String path = FilenameUtils.separatorsToSystem(dirPath);
 		for (int i = 0; i < numberOfDirs; i++) {
-			File dir = createEmptyDirectory(path, dirsName + i);
+			File dir = createEmptyDirectory(path, dirsName + " " + i);
 		}
 		return true;
 	}
 
 	public File createEmptyDirectory(String dirPath, String fileName) throws CreateException {
-		String path = FilenameUtils.separatorsToSystem(dirPath + "\\" + fileName);
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + dirPath + "\\" + fileName);
 		File dir = new File(path);
 		if (!dir.exists()) {
 			// System.out.println(dir.toString());
@@ -98,7 +75,7 @@ public class MyLocalDirectory implements MyDir {
 	}
 
 	public boolean delDirectory(String ToDelPath, String dirName) throws Exception {
-		String path = FilenameUtils.separatorsToSystem(ToDelPath + "\\" + dirName);
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + ToDelPath + "\\" + dirName);
 		File toDel = new File(path);
 		if (!toDel.exists()) {
 			throw new NotFoundException(dirName);
@@ -117,12 +94,13 @@ public class MyLocalDirectory implements MyDir {
 	}
 
 	public boolean downloadDirectory(String pathSource, String pathDest) throws DownloadException {
-		String newPathSource = FilenameUtils.separatorsToSystem(pathSource);
+		String newPathSource = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + pathSource);
 		String newPathDest = FilenameUtils.separatorsToSystem(pathDest);
 		File sourceFile = new File(newPathSource);
 		File destFile = new File(newPathDest);
 		try {
 			FileUtils.copyDirectory(sourceFile, destFile);
+			System.out.println("Dir downloaded");
 		} catch (IOException e) {
 			throw new DownloadException();
 			// e.printStackTrace();
@@ -131,7 +109,7 @@ public class MyLocalDirectory implements MyDir {
 	}
 
 	public String listDirectories(String dirPath) {
-		String path = FilenameUtils.separatorsToSystem(dirPath);
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + dirPath);
 		File file = new File(path);
 		String[] directories = file.list(new FilenameFilter() {
 			@Override
@@ -143,8 +121,8 @@ public class MyLocalDirectory implements MyDir {
 		return Arrays.toString(directories);
 	}
 
-	public String listFiles(String directoryPath,boolean withMetaData) {
-		String path = FilenameUtils.separatorsToSystem(directoryPath);
+	public String listFiles(String directoryPath, boolean withMetaData) {
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + directoryPath);
 		File file = new File(path);
 		String[] directories = file.list(new FilenameFilter() {
 			@Override
@@ -154,33 +132,34 @@ public class MyLocalDirectory implements MyDir {
 		});
 		ArrayList<String> toRet = new ArrayList<String>();
 		toRet.toArray(directories);
-		if(withMetaData) {
-		for (int i = 0; i < directories.length; i++) {
-			File tmp = new File(directories[i]+".metaData");
-			if(!tmp.exists()) {
-				toRet.remove(i);
+		if (withMetaData) {
+			for (int i = 0; i < directories.length; i++) {
+				File tmp = new File(directories[i] + ".metaData");
+				if (!tmp.exists()) {
+					toRet.remove(i);
+				}
 			}
-		}}
+		}
 		// System.out.println(Arrays.toString(directories));
 		return toRet.toString();
 	}
 
 	public List<File> getFilesWithExtension(String dirPath, String extension) {
 		String[] ext = { extension };
-		String path = FilenameUtils.separatorsToSystem(dirPath);
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + dirPath);
 		File file = new File(path);
 		List<File> files = (List<File>) FileUtils.listFiles(file, ext, false);
 		// TODO Da li treba da se vrati lista imena ili lista fajlova?
 		return files;
 	}
 
-	//public String getFilesWithMetadata(boolean withMetaData) {
-		
-		//return null;
-	//}
+	// public String getFilesWithMetadata(boolean withMetaData) {
+
+	// return null;
+	// }
 
 	public List<String> getAllFiles(boolean sorted, String dirPath) throws Exception {
-		String path = FilenameUtils.separatorsToSystem(dirPath);
+		String path = FilenameUtils.separatorsToSystem(storage.getRootDirPath() + "\\" + dirPath);
 		File root = new File(path);
 		// Za slucaj da se na prosledjenoj putanji ne nalazi direktorijum
 		if (!root.isDirectory()) {
@@ -220,7 +199,7 @@ public class MyLocalDirectory implements MyDir {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -247,6 +226,14 @@ public class MyLocalDirectory implements MyDir {
 	public boolean createEmptyDirectoryB(String path, String fileName) throws Exception {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public FileStorageLocal getStorage() {
+		return storage;
+	}
+
+	public void setStorage(FileStorageLocal storage) {
+		this.storage = storage;
 	}
 
 }

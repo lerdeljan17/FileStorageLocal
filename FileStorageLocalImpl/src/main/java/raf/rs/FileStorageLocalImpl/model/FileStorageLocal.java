@@ -28,6 +28,7 @@ public class FileStorageLocal implements FileStorage {
 	private String rootDirPath;
 
 	private ArrayList<User> users;
+	private ArrayList<User> connectedUsers;
 	private User currentUser;
 
 	/**
@@ -39,17 +40,17 @@ public class FileStorageLocal implements FileStorage {
 	public FileStorageLocal(String rootPath, boolean initBoolean, User user) throws Exception {
 		super();
 		this.rootDirPath = FilenameUtils.separatorsToSystem(rootPath);
+		this.connectedUsers = new ArrayList<User>();
 
 		if (initBoolean) {
 			user.setRootUser(true);
 			this.users = new ArrayList<User>();
 			this.users.add(user);
-			user.setStorage(this);
 			this.initFileStorage(rootPath, user);
 		} else {
 			connect(user);
 		}
-
+		((LocalUser) user).setFileStorage(this);
 		this.currentUser = user;
 	}
 
@@ -68,6 +69,7 @@ public class FileStorageLocal implements FileStorage {
 		}
 
 		this.forbiddenExtensions = new ArrayList<String>();
+		this.connectedUsers.add(rootUser);
 
 		return true;
 	}
@@ -77,37 +79,32 @@ public class FileStorageLocal implements FileStorage {
 		this.currentUser = user;
 		this.users = new ArrayList<User>();
 		openConnectionWithUser(user);
+
+		if (connectedUsers.contains(user)) {
+			System.out.println("User je vec konektovan!");
+			return false;
+		}
+		System.out.println("Iz connect " + user);
+		this.connectedUsers.add(user);
+
 		return true;
 	}
-
-	/*
-	 * private void createFileStorageMetaData() { String storagePath =
-	 * FilenameUtils.separatorsToSystem(rootDirPath + ".settings"); File storageFile
-	 * = new File(storagePath); JSONArray jsa = new JSONArray(); JSONObject jso =
-	 * new JSONObject(); jso.put("username", this.currentUser.getUsername());
-	 * jso.put("password", this.currentUser.getPassword()); jso.put("isRoot",
-	 * this.currentUser.isRootUser()); jso.put("privilages",
-	 * this.currentUser.getPrivilages()); jsa.put(jso);
-	 * System.out.println(jsa.toString());
-	 * 
-	 * FileWriter fw; try { fw = new FileWriter(storageFile); PrintWriter pw = new
-	 * PrintWriter(fw); pw.append(jsa.toString());
-	 * System.out.println("Successfully Copied JSON Object to File..."); fw.close();
-	 * pw.close(); } catch (IOException e) { e.printStackTrace(); } //
-	 * this.rootDir.setSettingsFile(storageFile); }
-	 */
 
 	@Override
 	public void addForbiddenExtension(String extension) {
 		if (extension.contains(".")) {
-			extension.replace(".", "");
+			extension = extension.replace(".", "");
 		}
-		this.forbiddenExtensions.add(extension);
+		this.forbiddenExtensions.add(extension.toLowerCase());
 	}
 
 	@Override
 	public boolean closeConnectionWithUser(User user) {
-		String path = FilenameUtils.separatorsToSystem(rootDirPath + getFileStorageName() + ".settings");
+		if (!this.connectedUsers.contains(user)) {
+			System.out.println(user + " nije ni konektovan na skladiste!");
+		}
+
+		String path = FilenameUtils.separatorsToSystem(rootDirPath + "\\" + getFileStorageName() + ".settings");
 		System.out.println("Putanja do fajla sa settings: " + path);
 		File settings = new File(path);
 
@@ -132,7 +129,7 @@ public class FileStorageLocal implements FileStorage {
 		try {
 			fw = new FileWriter(settings);
 			PrintWriter pw = new PrintWriter(fw);
-			pw.write(jsa.toString());
+			pw.write(js.toString());
 			System.out.println("Successfully Copied JSON Object to File...");
 			fw.close();
 			pw.close();
@@ -146,12 +143,14 @@ public class FileStorageLocal implements FileStorage {
 			System.out.println("Greska prilikom pravljenja " + getFileStorageName() + ".settings");
 		}
 
+		this.connectedUsers.remove(user);
+
 		return true;
 	}
 
 	@Override
 	public boolean openConnectionWithUser(User user) throws Exception {
-		String path = FilenameUtils.separatorsToSystem(rootDirPath + getFileStorageName() + ".settings");
+		String path = FilenameUtils.separatorsToSystem(rootDirPath + "\\" + getFileStorageName() + ".settings");
 		System.out.println("Putanja do fajla sa settings: " + path);
 		File settings = new File(path);
 
@@ -164,26 +163,26 @@ public class FileStorageLocal implements FileStorage {
 
 		JSONObject mainObj = new JSONObject(jsonStr);
 
-		JSONArray schemaObject = new JSONArray(mainObj.getJSONArray("users"));
-		for (int i = 0; i < schemaObject.length(); i++) {
+		// JSONArray schemaObject = new JSONArray();
+		for (int i = 0; i < mainObj.getJSONArray("users").length(); i++) {
 			ArrayList<PrivilageType> prv = new ArrayList<PrivilageType>();
-			for (Object object : schemaObject.getJSONObject(i).getJSONArray("privilages").toList()) {
+			for (Object object : mainObj.getJSONArray("users").getJSONObject(i).getJSONArray("privilages").toList()) {
 				PrivilageType type = PrivilageType.valueOf((String) object);
 				prv.add(type);
 			}
-			
-			User newUser = new User(schemaObject.getJSONObject(i).getString("username").toString(),
-					schemaObject.getJSONObject(i).getString("password").toString(),
-					schemaObject.getJSONObject(i).getBoolean("isRoot"), prv);
+
+			User newUser = new User(mainObj.getJSONArray("users").getJSONObject(i).getString("username").toString(),
+					mainObj.getJSONArray("users").getJSONObject(i).getString("password").toString(),
+					mainObj.getJSONArray("users").getJSONObject(i).getBoolean("isRoot"), prv);
 			this.users.add(newUser);
 			// System.out.println("Novi user " + newUser);
 		}
-		
-		JSONArray extensions = new JSONArray(mainObj.get("extensions"));
-		for (int i = 0; i < extensions.length(); i++) {
-			forbiddenExtensions.add((String) extensions.getString(i));
+
+		// JSONArray extensions = new JSONArray(mainObj.get("extensions"));
+		for (int i = 0; i < mainObj.getJSONArray("extensions").length(); i++) {
+			forbiddenExtensions.add((String) mainObj.getJSONArray("extensions").getString(i));
 		}
-		
+
 		if (this.users.contains(user)
 				&& this.users.get(this.users.indexOf(user)).getPassword().equals(user.getPassword())) {
 			System.out.println("Connection established");
@@ -196,19 +195,19 @@ public class FileStorageLocal implements FileStorage {
 	public String getRootDirPath() {
 		return rootDirPath;
 	}
-	
+
 	public User getCurrentUser() {
 		return currentUser;
 	}
-	
+
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
 	}
-	
+
 	public void setRootDirPath(String rootDirPath) {
 		this.rootDirPath = rootDirPath;
 	}
-	
+
 	public List<String> getForbiddenExtensions() {
 		return forbiddenExtensions;
 	}
@@ -233,8 +232,17 @@ public class FileStorageLocal implements FileStorage {
 		this.currentUser = rootUser;
 	}
 
+	public ArrayList<User> getConnectedUsers() {
+		return connectedUsers;
+	}
+
+	public void setConnectedUsers(ArrayList<User> connectedUsers) {
+		this.connectedUsers = connectedUsers;
+	}
+
 	private String getFileStorageName() {
-		String[] parts = this.rootDirPath.split("\\");
+		System.out.println(this.rootDirPath);
+		String[] parts = this.rootDirPath.split("\\\\");
 		return parts[parts.length - 1];
 	}
 

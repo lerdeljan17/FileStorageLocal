@@ -27,10 +27,15 @@ public class LocalUser extends User {
 	}
 
 	@Override
-	public User createNewUser(String username, String password) {
-		User user = new User(username, password);
-		fileStorage.getUsers().add(user);
-		return user;
+	public User createNewUser(User user, String username, String password) {
+		if(user == null || !user.isRootUser()) {
+			return null;
+		}
+		
+		LocalUser newUser = new LocalUser(username, password, false);
+		newUser.setFileStorage(((LocalUser)user).getFileStorage());
+		fileStorage.getUsers().add(newUser);
+		return newUser;
 	}
 
 	@Override
@@ -61,8 +66,8 @@ public class LocalUser extends User {
 		}
 		
 		int index = fileStorage.getUsers().indexOf(user);
-		
-		if (!fileStorage.getUsers().get(index).getPrivilages().contains(privilage)) {
+		System.out.println();
+		if (fileStorage.getUsers().get(index).getPrivilages().contains(privilage)) {
 			throw new PrivilageException("Korisnik vec ima privilegiju koju zelite da dodate!");
 		}
 		
